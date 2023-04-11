@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+.app{
+    font-family: 'Poppins';
+}
+.container{
+    width: 80%;
+    margin: auto;
+}
+.text-center{
+    text-align: center;
+}
+.home-tutor-img{
+    height: 200px;
+}
+.mt-10{
+    margin-top: 10px;
+}
+.row{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.option{
+    background: none;
+    border: 1px solid grey;
+    padding: 5px 30px;
+    border-radius: 5px;
+    font-size: 30px;
+    font-family: 'Poppins';
+}
+.selected{
+    border-color: orange;
+    background-color: orange;
+}
+.mt-50{
+    margin-top: 50px;
+}
+.btn-start{
+    border: 5px solid black;
+    padding: 20px 50px;
+    font-size: 30px;
+    font-family: Poppins;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+}
+.answers{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.answer{
+    padding: 30px 0px;
+    border: 1px solid black;
+    width: 19%;   
+    text-align: center;
+    cursor: pointer;
+}
+.w-50{
+    width: 50%;
+    margin: auto;
+}
+.wrong-answer{
+    background-color: black;
+}
+.correct-answer{
+    background-color: green;
+}
+.winning-answer{
+    background-color: yellow;
+}
