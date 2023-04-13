@@ -11,6 +11,15 @@ use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\RestaurantReviewController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\StateController;
+use App\Http\Controllers\OrderController;;
+use App\Http\Controllers\UserOrderController;;
+
+Route::prefix('order')->group(function (){
+    Route::post('/addOrder',[OrderController::class,'addOrder']);
+});
+
+
+
 
 //Auth Routes
 Route::prefix('auth')->group(function () {
