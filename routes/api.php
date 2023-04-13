@@ -14,13 +14,6 @@ use App\Http\Controllers\StateController;
 use App\Http\Controllers\OrderController;;
 use App\Http\Controllers\UserOrderController;;
 
-Route::prefix('order')->group(function (){
-    Route::post('/addOrder',[OrderController::class,'addOrder']);
-});
-
-
-
-
 //Auth Routes
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -49,6 +42,10 @@ Route::prefix('recipe')->group(function () {
     Route::get('/showAll', [RecipeController::class, 'showAllRecipe']);
 });
 
+Route::prefix('order')->group(function (){
+    Route::post('/add',[OrderController::class,'add']);
+    Route::post('/updateStatus',[OrderController::class,'updateStatus']);
+});
 
 //<-------- Restaurant routes ------->
 Route::prefix('restaurant')->group(function () {
@@ -60,6 +57,8 @@ Route::prefix('restaurant')->group(function () {
     Route::get('categories', [RestaurantController::class, 'categories']);
     Route::get('/showAll', [RestaurantController::class, 'showAllRestaurant']);
     Route::post('/showSpecific', [RestaurantController::class, 'showSpecificRestaurant']);
+    Route::post('/checkOrders',[RestaurantController::class,'checkOrders']);
+
    
 
     //RestaurantReview Routes

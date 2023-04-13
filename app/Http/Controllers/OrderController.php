@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function addOrder(Request $request)
+    public function add(Request $request)
 {
     $request->validate([
         'orders' => 'required|array',
@@ -37,12 +37,28 @@ class OrderController extends Controller
         $order->qty = $odr['qty'];
         $order->price_per_item = $odr['price_per_item'];
         $order->total_price = $odr['qty'] * $odr['price_per_item'];
-        $order->order_id =  $userOrder->id;
+        $order->user_orders_id =  $userOrder->id;
         $order->save();
     }
      return response()->json(['message' => 'success']);
 }
 
-    
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:user_orders,id',
+            'status' => 'numeric|required',
+        ]);
+
+        $UserOrder   = UserOrder::find($request->id);
+        if ($UserOrder)
+        {
+            $UserOrder->status = $request->status;
+            $UserOrder->save();
+            return response()->json('Status updated successfully');
+        }
+        return response()->json('User Order not found');
+        }
+
 
 }

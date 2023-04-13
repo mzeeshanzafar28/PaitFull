@@ -9,6 +9,7 @@ use App\Models\RestaurantCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserOrder;
 
 class RestaurantController extends Controller
 {
@@ -359,6 +360,21 @@ class RestaurantController extends Controller
         'total_menus' => count($menus),
         'data' => $menus,
     ];
+}
+
+public function checkOrders(Request $request)
+{
+    $request->validate([
+        'restaurant_id' => 'required|exists:restaurants,id'
+    ]);
+    
+    $userOrders = UserOrder::where('restaurant_id', $request->restaurant_id)->get();
+    
+        if ($userOrders->count() > 0) {
+        return response()->json($userOrders);
+    }
+    
+    return response()->json('nothing to show');
 }
 
 
