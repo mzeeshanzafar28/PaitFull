@@ -411,7 +411,7 @@ public function manageMenuReview(Request $request)
 
 }
 
-//delte a placed menu review
+//delte a menu review
 public function deleteMenuReview(Request $request)
 {
     $request->validate([
@@ -425,5 +425,27 @@ public function deleteMenuReview(Request $request)
     }
     return response()->json(['message' => 'review does not exist']);
 }
+
+// show all the reviews placed on a menu
+public function showAllMenuReviews()
+{
+$reviews = MenuReview::all();
+if ($reviews->count() > 0)
+{
+    return response()->json($reviews);
+}
+return response()->json('nothing to show');
+}
+
+//show all the orders placed by a user
+public function showUserOrders()
+{
+   $orders = UserOrder::where('user_id', Auth::id())->get();
+   if ($orders->count() > 0) {
+       return response()->json($orders);
+   }    
+return response()->json('nothing to show');
+}
+
 
 }

@@ -13,6 +13,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\OrderController;
 
+
 //Auth Routes | no middleware routes
 Route::prefix('auth')->group(function () {
 
@@ -60,6 +61,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             Route::post('/add', [OrderController::class, 'add']);
             Route::post('/updateStatus', [OrderController::class, 'updateStatus']);
             Route::post('/showAll', [RestaurantController::class, 'checkOrders']);
+            Route::get('/showUserOrders', [RestaurantController::class, 'showUserOrders']);
+
         });
 
 
@@ -84,6 +87,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             Route::post('/addReview', [RestaurantController::class, 'manageMenuReview']);
             Route::post('/editReview', [RestaurantController::class, 'manageMenuReview']);
             Route::post('/deleteReview', [RestaurantController::class, 'deleteMenuReview']);
+            Route::get('/showAllMenuReviews',[RestaurantController::class,'showAllMenuReviews']);
 
 
 
