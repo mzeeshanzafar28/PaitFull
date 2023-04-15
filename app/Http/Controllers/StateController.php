@@ -9,12 +9,14 @@ use App\Models\City;
 
 class StateController extends Controller
 {
+//function to display all the cities of a state
     public function CitiesOfState($state_id)
     {
         $cities = City::where('state_id', $state_id)->get();
         return response()->json(['message' => 'success', 'cities' => $cities]);
     }
 
+// function to display all the states
     public function allStates()
 {
     $state = State::all();

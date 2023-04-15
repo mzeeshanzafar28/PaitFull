@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Recipe;
-// use Validator;
 class RecipeController extends Controller
 {
+    //add a new recipe or manage|edit an existing one
     public function manageRecipe(Request $request)
 {
 
@@ -54,14 +54,19 @@ class RecipeController extends Controller
         $recipe->save();
         $data = [
             'message' => "Recipe Successfully Submitted for Approval",
-            'receipie' => $recipe,
-            'name' => $request->name
+            'name' => $request->name,
+            'receipie' => $recipe
         ];
         return response()->json($data);
     }
     
+    //delete an existing recipe
 public function deleteRecipe(Request $request)
 {
+    $request->validate([
+        'id' => 'required|exists:recipes,id'
+    ]);
+
     $recipe = Recipe::find($request->id);
     if ($recipe)
     {
@@ -73,12 +78,14 @@ public function deleteRecipe(Request $request)
     }
 }
 
+
+//show alll recipes
 public function showAllRecipe()
 {
-    $recipe = Recipe::all();
-    if ($recipe->count() > 0)
+    $recipes = Recipe::all();
+    if ($recipes->count() > 0)
     {
-        return response()->json("All recipes",$recipe);
+        return response()->json(["Enlisting all recipes as" => $recipes]);
     }
     else{
         return response()->json("nothing to display");

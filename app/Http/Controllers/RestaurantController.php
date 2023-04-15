@@ -10,9 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserOrder;
-
+use App\Models\MenuReview;
 class RestaurantController extends Controller
 {
+//function to add a new restaurant
     public function addRestaurant(Request $request)
     {
         $request->validate([
@@ -29,7 +30,7 @@ class RestaurantController extends Controller
 
         $restaurant = new Restaurant();
         $restaurant->user_id = Auth::id();
-        $restaurant->user_id = $request->user_id;
+        // $restaurant->user_id = $request->user_id;
         $restaurant->name = $request->name;
         $restaurant->address = $request->address;
         $restaurant->contact = $request->contact;
@@ -43,6 +44,7 @@ class RestaurantController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $name = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
+            $image->move(public_path("restaurant_images"), $name);
             $type = $image->getClientType();
             $path = '/restaurant_images/' . $name;
             $obj = [
@@ -50,7 +52,6 @@ class RestaurantController extends Controller
                 'path' => $path,
                 'type' => $type,
             ];
-            $image->move(public_path("restaurant_images"), $name);
             $restaurant->image = $obj;
         }
 
@@ -66,33 +67,39 @@ class RestaurantController extends Controller
         return response()->json($data);
     }
 
-    //Delete Restaurant
 
+//function to delete an added restaurant
     public function deleteRestaurant(Request $request)
     {
         $request->validate([
-            'id' => 'required'
+            'id' => 'required|exists:restaurants,id'
         ]);
         $restaurant = Restaurant::find($request->id);
-        $restaurant->delete();
+        if ($restaurant)
+        {
+            $restaurant->delete();
+            return response()->json([
+                'message' => 'Restaurant deleted successfully',
+            ]);
+        }
         return response()->json([
-            'message' => 'Restaurant deleted successfully',
+            'message' => 'Restaurant not found',
         ]);
     }
 
-    //Edit Restaurant 
-
+    
+    //function to edit an exisiting restaurant 
     public function editRestaurant(Request $request)
     {
         $request->validate([
-            'id' => 'required',
+            'id' => 'required|exists:restaurants,id',
             'name' => 'required',
             'address' => 'required',
             'contact' => 'required',
             'open_time' => 'required',
             'close_time' => 'required',
 
-            'image' => 'mimes:jpeg,png,jpg',
+            'image' => 'required|mimes:jpeg,png,jpg',
             'type' => 'required',
         ]);
 
@@ -110,6 +117,7 @@ class RestaurantController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $name = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
+            $image->move(public_path("restaurant_images"), $name);
             $type = $image->getClientType();
             $path = '/restaurant_images/' . $name;
             $obj = [
@@ -117,8 +125,7 @@ class RestaurantController extends Controller
                 'path' => $path,
                 'type' => $type,
             ];
-            $image->move(public_path("restaurant_images"), $name);
-            $restaurant->image = json_encode($image);
+            $restaurant->image = json_encode($obj);
         }
 
         $restaurant->type = $request->type;
@@ -130,7 +137,7 @@ class RestaurantController extends Controller
         return response()->json($data);
     }
 
-    //Show Restaurant
+//Show all the Restaurants belonging to a particular user
     public function showRestaurant()
     {
         $restaurant = Restaurant::where('user_id', Auth::id())->get();
@@ -159,7 +166,7 @@ class RestaurantController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'restaurant_id' => 'required|exists:Restaurants,id',
+            'restaurant_id' => 'required|exists:restaurants,id',
             'category_id' => 'required|exists:categories,id',
         ]);
         $restaurant_category = new RestaurantCategory();
@@ -172,7 +179,7 @@ class RestaurantController extends Controller
             'data' => $restaurant_category
         ]);
     }
-    //Edit Restaurant Categories
+    //Edit Restaurant Category
     public function editRestaurantCategory(Request $request)
     {
         $request->validate([
@@ -193,7 +200,7 @@ class RestaurantController extends Controller
         ]);
 
     }
-
+//show all the available restaurants
     public function showAllRestaurant()
     {
         $restaurant = Restaurant::all();
@@ -203,10 +210,11 @@ class RestaurantController extends Controller
         return response()->json(['message' => 'Nothing to show']);
     }
 
+//function to search|get a specific restaurant
     public function showSpecificRestaurant(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:restaurants'
+            'id' => 'required|exists:restaurants,id'
         ]);
 
         $restaurant = Restaurant::find($request->id);
@@ -217,8 +225,8 @@ class RestaurantController extends Controller
         return response()->json(['message' => 'Restaurant not found']);
 
     }
+    
     //Show Restaurant Categories
-
     public function showRestaurantCategory($restaurant_id)
     {
         $categories = RestaurantCategory::with(['category'])->where('restaurant_id', $restaurant_id)->orderBy('id', 'DESC')->get();
@@ -235,8 +243,8 @@ class RestaurantController extends Controller
         }
     }
 
-    // Add Menu
-
+    
+    // Add a new menu or edit an existing one
     public function manageMenu(Request $request)
     {
 
@@ -247,6 +255,7 @@ class RestaurantController extends Controller
             'regular_price' => 'required',
             'on_discount' => 'required',
             'discounted_price' => 'nullable|numeric',
+            // images is an array
             'images' => 'required|mimes:jpg,jpeg,png',
             'min_persons' => 'required',
             'max_persons' => 'required',
@@ -289,7 +298,7 @@ class RestaurantController extends Controller
         return response()->json(['message' => 'Success', 'menu' => $menu]);
 
     }
-    //Show Menu
+    //Show Menus
     public function showMenu($restaurant_category_id)
     {
         $menu = Menu::join('food_types', 'menus.food_type_id', '=', 'food_types.id')
@@ -309,6 +318,7 @@ class RestaurantController extends Controller
 
     }
 
+    //search a menu based on the category, price and number of persons
     public function searchMenus(Request $request)
 {
     $request->validate([
@@ -362,6 +372,7 @@ class RestaurantController extends Controller
     ];
 }
 
+//check all the orders placed on a restaurant
 public function checkOrders(Request $request)
 {
     $request->validate([
@@ -377,8 +388,42 @@ public function checkOrders(Request $request)
     return response()->json('nothing to show');
 }
 
+// add a new review on an ordered menu or edit an existing one
+public function manageMenuReview(Request $request)
+{
+    $request->validate([
+        'order_id' => 'required|exists:orders,id',
+        'menu_id' => 'required|exists:orders,menu_id',
+        'review' => 'required',
+        'rating' => 'numeric|required'
+    ]);
+    $review = MenuReview::find($request->id);
+    if (!$review)
+    {
+        $review = new MenuReview();
+    }
+    $review->order_id = $request->order_id;
+    $review->menu_id = $request->menu_id;
+    $review->review = $request->review;
+    $review->rating = $request->rating;
+    $review->save();
+    return response()->json(['message' => 'success','review' => $review]);
 
+}
 
-
+//delte a placed menu review
+public function deleteMenuReview(Request $request)
+{
+    $request->validate([
+        'id' => 'required|exists:menu_reviews,id'
+    ]);
+    $review = MenuReview::find($request->id);
+    if ($review)
+    {
+        $review->delete();
+        return response()->json(['message' => 'review deleted successfully']);
+    }
+    return response()->json(['message' => 'review does not exist']);
+}
 
 }

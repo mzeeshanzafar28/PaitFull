@@ -10,6 +10,7 @@ use App\Models\Comment;
 
 class CommentController extends Controller
 {
+//function to add comment on a post
     public function addComment(Request $request)
     {
         $request->validate([

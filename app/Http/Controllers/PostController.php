@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+//function to add a new post
     public function addPost(Request $request)
     {
         $request->validate([
+            //files is an array
             'files' => 'required|mimes:jpg,jpeg,png,mp4,gif',
             'description' => 'required',
         ]);
@@ -41,6 +43,7 @@ class PostController extends Controller
         return response()->json(['message' => 'Success', 'post' => $post]);
     }
 
+//function to delete a post
     public function deletePost(Request $request)
     {
         $request->validate([

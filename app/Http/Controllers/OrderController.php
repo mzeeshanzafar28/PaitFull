@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+//place a new order
     public function add(Request $request)
 {
     $request->validate([
+        //orders is an array
         'orders' => 'required|array',
         'restaurant_id' => 'required|exists:restaurants,id',
         'order_charges' => 'numeric|required',
@@ -22,7 +24,7 @@ class OrderController extends Controller
 
     $userOrder = new UserOrder();
     $userOrder->order_id = rand(000000,999999);
-    $userOrder->user_id = 1;
+    $userOrder->user_id = Auth::id();
     $userOrder->restaurant_id = $request->restaurant_id;
     $userOrder->status = 1;
     $userOrder->total_items = count($request->orders);
@@ -37,12 +39,13 @@ class OrderController extends Controller
         $order->qty = $odr['qty'];
         $order->price_per_item = $odr['price_per_item'];
         $order->total_price = $odr['qty'] * $odr['price_per_item'];
-        $order->user_orders_id =  $userOrder->id;
+        $order->user_order_id =  $userOrder->id;
         $order->save();
     }
      return response()->json(['message' => 'success']);
 }
 
+//update the status of an already placed order
     public function updateStatus(Request $request)
     {
         $request->validate([

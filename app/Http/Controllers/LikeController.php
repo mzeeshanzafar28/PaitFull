@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Like;
 class LikeController extends Controller
 {
+    //function to add like on a post
     public function addLike(Request $request)
 {
     $request->validate([

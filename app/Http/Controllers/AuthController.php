@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
+//function to register a new user
     public function register(Request $request){
         
         $request->validate([
@@ -29,6 +30,7 @@ class AuthController extends Controller
         return response()->json($data);
     }
 
+//function for login
     public function login(Request $request){
 
         $request->validate([
@@ -53,14 +55,14 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Invalid phone number or password',
             ], 422);
-            //422 error print krwany k lia 
         }
     }
 
+    //when user clicks on forget password and submits his registered phone number, this function will be called
     public function forgetPasswordAction(Request $request)
     {
         $request->validate([
-            'phone' => 'numeric|required',
+            'phone' => 'required|exists:users,phone',
         ]);
         $otp = rand(000000,999999);
     
@@ -71,11 +73,12 @@ class AuthController extends Controller
     
         $user->otp = $otp;
         $user->save();
-        // Integrate SMS API Here
+        // ****** Integrate SMS API Here ******
         
         return response()->json(['message' => 'Your login OTP has been sent successfully on your phone number', 'phone' => $user->phone], 200);
     }
-    
+
+    //When user submits OTP, this function will be called
     public function matchOTP(Request $request)
 {
     $request->validate([
@@ -91,7 +94,7 @@ class AuthController extends Controller
     return response()->json(['message' => 'Invalid']);
 }
 
-
+//After OTP verification, user will be prompted to change his/her password and this function will be called on form submission
     public function newPassword(Request $request){
         $request->validae([
             'password' => 'required|min:8',
@@ -103,25 +106,33 @@ class AuthController extends Controller
         return response()->json(['message' => 'success, login now']);
     }
 
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'oldPassword'=> 'required|min:8',
-            'newPassword'=> 'required|min:8',
-            "confirmedNewPassword"=> 'required|same:newPassword'
-        ]);
-        $user = User::find(Auth::id());
-        if ($user)
-        {
-            $user->password = Hash::make($request->newPassword);
-            $user->save();
-            return response()->json(['message' => 'Password updated successfully']);
-        }
-
+//Function to update password of a logined user
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'oldPassword'=> 'required|min:8',
+        'newPassword'=> 'required|min:8',
+        "confirmedNewPassword"=> 'required|same:newPassword'
+    ]);
+    
+    $user = User::find(Auth::id());
+    
+    if (!$user) {
         return response()->json(['message' => 'invalid user']);
-
+    }
+    
+    if (!Hash::check($request->oldPassword, $user->password)) {
+        return response()->json(['message' => 'Invalid old password']);
     }
 
+    $user->password = Hash::make($request->newPassword);
+    $user->save();
+    
+    return response()->json(['message' => 'Password updated successfully']);
+}
+
+
+//function to logout
     public function logout(){
         $user = Auth::user();
         $user->tokens()->delete();
